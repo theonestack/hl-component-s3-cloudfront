@@ -1,0 +1,3 @@
+origins:
+  s3bucket:
+    source: s3
