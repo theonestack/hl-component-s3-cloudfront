@@ -8,7 +8,7 @@ CloudFormation do
         Effect: 'Allow',
         Action: 's3:GetObject',
         Resource: FnJoin('', [ 'arn:aws:s3:::', Ref("Bucket"), '/*']),
-        Principal: { CanonicalUser: FnGetAtt(:Distribution, 'S3CanonicalUserId') }
+        Principal: { CanonicalUser: FnGetAtt('s3bucketOriginAccessIdentity', 'S3CanonicalUserId') }
       }
     ]
   }
