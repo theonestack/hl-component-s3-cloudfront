@@ -8,7 +8,7 @@ CfhighlanderTemplate do
     ComponentParam 'DnsDomain', isGlobal: true
   end
 
-  Component name: cloudfront_component_name, template: 'cloudfront@0.4.0', render: Inline do
+  Component name: cloudfront_component_name, template: 'cloudfront@master.snapshot', render: Inline do
     parameter name: "s3bucketOriginDomainName", value: FnGetAtt('Bucket', 'DomainName')
   end
 
