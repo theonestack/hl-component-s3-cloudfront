@@ -1,1 +1,10 @@
 bucket_name: frontend.${EnvironmentName}.${DnsDomain}
+cloudfront_component_name: cloudfront
+# bucket_policy:
+#   OpsAccount:
+#     principal:
+#       AWS: arn:aws:iam::123456789:root
+# components:
+#   cloudfront:   # This must match 'cloudfront_component_name'
+#     config:
+#       comment: Frontend in S3
