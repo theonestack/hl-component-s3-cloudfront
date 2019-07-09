@@ -1,0 +1,13 @@
+test_metadata:
+  type: config
+  name: Bucket and policy
+  description: Create bucket and bucket policy
+
+bucket_name: frontend.${EnvironmentName}.${DnsDomain}
+bucket_policy:
+  loadbalancer-logs:
+    actions:
+      - s3:PutObject
+    principal:
+      AWS: "arn:aws:iam::111111111111:root"
+
