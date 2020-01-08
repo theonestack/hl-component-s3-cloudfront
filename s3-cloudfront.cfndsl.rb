@@ -13,8 +13,8 @@ CloudFormation do
     ]
   }
 
-if defined? bucket_policy
 
+  bucket_policy = external_parameters.fetch(bucket_policy, {})
   bucket_policy.each do |sid, statement_config|
     statement = {}
     statement["Sid"] = sid
@@ -26,11 +26,9 @@ if defined? bucket_policy
     policy_document[:Statement] << statement
   end
 
-end
-
 
   S3_Bucket('Bucket') do
-    BucketName FnSub(bucket_name)
+    BucketName FnSub(external_parameters[:bucket_name])
   end
 
   S3_BucketPolicy("BucketPolicy") do
