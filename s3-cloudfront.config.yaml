@@ -1,5 +1,11 @@
 bucket_name: frontend.${EnvironmentName}.${DnsDomain}
 cloudfront_component_name: cloudfront
+
+origins:
+  s3bucket:
+    source: s3
+
+
 # bucket_policy:
 #   OpsAccount:
 #     principal:
