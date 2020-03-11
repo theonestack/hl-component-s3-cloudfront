@@ -9,6 +9,12 @@ CloudFormation do
         Action: 's3:GetObject',
         Resource: FnJoin('', [ 'arn:aws:s3:::', Ref("Bucket"), '/*']),
         Principal: { CanonicalUser: { "Fn::GetAtt" => ['s3bucketOriginAccessIdentity', 'S3CanonicalUserId'] } }
+      },
+      {
+        Effect: 'Allow',
+        Action: 's3:ListBucket',
+        Resource: FnJoin('', [ 'arn:aws:s3:::', Ref("Bucket")]),
+        Principal: { CanonicalUser: { "Fn::GetAtt" => ['s3bucketOriginAccessIdentity', 'S3CanonicalUserId'] } }
       }
     ]
   }
