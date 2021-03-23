@@ -1,0 +1,13 @@
+test_metadata:
+  type: config
+  name: Bucket and encryption
+  description: Create bucket with encryption
+
+bucket_name: frontend.${EnvironmentName}.${DnsDomain}
+enable_s3_logging: true
+
+bucket_encryption:
+  ServerSideEncryptionConfiguration:
+    -
+      ServerSideEncryptionByDefault:
+        SSEAlgorithm: AES256
