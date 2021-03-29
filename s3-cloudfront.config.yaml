@@ -1,4 +1,5 @@
 bucket_name: frontend.${EnvironmentName}.${DnsDomain}
+enable_s3_logging: false
 cloudfront_component_name: cloudfront
 # bucket_policy:
 #   OpsAccount:

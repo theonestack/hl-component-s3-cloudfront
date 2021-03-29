@@ -6,6 +6,10 @@ CfhighlanderTemplate do
     ComponentParam 'EnvironmentName', 'dev', isGlobal: true
     ComponentParam 'EnvironmentType', 'development', allowedValues: ['development','production'], isGlobal: true
     ComponentParam 'DnsDomain', isGlobal: true
+    if enable_s3_logging
+      ComponentParam 'LogFilePrefix', ''
+      ComponentParam 'AccessLogsBucket'
+    end
   end
 
   Component name: cloudfront_component_name, template: 'cloudfront@master.snapshot', render: Inline, config: @config do

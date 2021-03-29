@@ -27,8 +27,18 @@ CloudFormation do
   end
 
 
+  bucket_encryption = external_parameters.fetch(:bucket_encryption, nil)
+  enable_s3_logging = external_parameters[:enable_s3_logging]
+
+  Condition(:SetLogFilePrefix, FnNot(FnEquals(Ref(:LogFilePrefix), ''))) if enable_s3_logging
+
   S3_Bucket('Bucket') do
     BucketName FnSub(external_parameters[:bucket_name])
+    LoggingConfiguration ({
+      DestinationBucketName: Ref(:AccessLogsBucket),
+      LogFilePrefix: FnIf(:SetLogFilePrefix, Ref(:LogFilePrefix), Ref('AWS::NoValue'))
+    }) if enable_s3_logging
+    BucketEncryption bucket_encryption unless bucket_encryption.nil?
   end
 
   S3_BucketPolicy("BucketPolicy") do
