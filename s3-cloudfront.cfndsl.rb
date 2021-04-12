@@ -14,7 +14,7 @@ CloudFormation do
   }
 
 
-  bucket_policy = external_parameters.fetch(bucket_policy, {})
+  bucket_policy = external_parameters.fetch(:bucket_policy, {})
   bucket_policy.each do |sid, statement_config|
     statement = {}
     statement["Sid"] = sid
