@@ -1,0 +1,12 @@
+test_metadata:
+  type: config
+  name: Block public access
+  description: Block public access to S3
+
+bucket_name: frontend.${EnvironmentName}.${DnsDomain}
+
+block_pub_access:
+  BlockPublicAcls: true
+  BlockPublicPolicy: true
+  IgnorePublicAcls: false
+  RestrictPublicBuckets: false
