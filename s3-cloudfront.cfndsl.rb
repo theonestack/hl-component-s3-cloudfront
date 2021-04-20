@@ -29,11 +29,13 @@ CloudFormation do
 
   bucket_encryption = external_parameters.fetch(:bucket_encryption, nil)
   enable_s3_logging = external_parameters[:enable_s3_logging]
+  block_pub_access = external_parameters.fetch(:block_pub_access, nil)
 
   Condition(:SetLogFilePrefix, FnNot(FnEquals(Ref(:LogFilePrefix), ''))) if enable_s3_logging
 
   S3_Bucket('Bucket') do
     BucketName FnSub(external_parameters[:bucket_name])
+    PublicAccessBlockConfiguration block_pub_access unless block_pub_access.nil?
     LoggingConfiguration ({
       DestinationBucketName: Ref(:AccessLogsBucket),
       LogFilePrefix: FnIf(:SetLogFilePrefix, Ref(:LogFilePrefix), Ref('AWS::NoValue'))
