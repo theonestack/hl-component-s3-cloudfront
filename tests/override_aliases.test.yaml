@@ -1,0 +1,7 @@
+test_metadata:
+  type: config
+  name: override_aliases
+  description: tests setting override aliases
+
+aliases:
+  - www.example.com
