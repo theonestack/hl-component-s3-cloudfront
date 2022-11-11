@@ -1,0 +1,10 @@
+test_metadata:
+  type: config
+  name: Bucket versioning
+  description: Create bucket with versioning enabled
+
+bucket_name: frontend.${EnvironmentName}.${DnsDomain}
+
+bucket_versioning:
+  Status: Enabled
+

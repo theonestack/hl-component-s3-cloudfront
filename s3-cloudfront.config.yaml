@@ -16,6 +16,8 @@ cloudfront_component_name: cloudfront
 #         - '*'
 #       Id: corsrules
 #       MaxAge: 3600
+# bucket_versioning:
+#   Status: Enabled
 # components:
 #   cloudfront:   # This must match 'cloudfront_component_name'
 #     config:
