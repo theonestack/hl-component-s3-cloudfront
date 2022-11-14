@@ -30,6 +30,8 @@ CloudFormation do
   bucket_encryption = external_parameters.fetch(:bucket_encryption, nil)
   enable_s3_logging = external_parameters[:enable_s3_logging]
   block_pub_access = external_parameters.fetch(:block_pub_access, nil)
+  bucket_cors = external_parameters.fetch(:bucket_cors, nil)
+  bucket_versioning = external_parameters.fetch(:bucket_versioning, nil)
 
   Condition(:SetLogFilePrefix, FnNot(FnEquals(Ref(:LogFilePrefix), ''))) if enable_s3_logging
 
@@ -41,6 +43,8 @@ CloudFormation do
       LogFilePrefix: FnIf(:SetLogFilePrefix, Ref(:LogFilePrefix), Ref('AWS::NoValue'))
     }) if enable_s3_logging
     BucketEncryption bucket_encryption unless bucket_encryption.nil?
+    CorsConfiguration bucket_cors unless bucket_cors.nil?
+    VersioningConfiguration bucket_versioning unless bucket_versioning.nil?
   end
 
   S3_BucketPolicy("BucketPolicy") do

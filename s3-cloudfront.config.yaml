@@ -5,6 +5,19 @@ cloudfront_component_name: cloudfront
 #   OpsAccount:
 #     principal:
 #       AWS: arn:aws:iam::123456789:root
+# bucket_cors:
+#   CorsRules:
+#     - AllowedHeaders:
+#         - '*'
+#       AllowedMethods:
+#         - GET
+#         - PUT
+#       AllowedOrigins:
+#         - '*'
+#       Id: corsrules
+#       MaxAge: 3600
+# bucket_versioning:
+#   Status: Enabled
 # components:
 #   cloudfront:   # This must match 'cloudfront_component_name'
 #     config:
