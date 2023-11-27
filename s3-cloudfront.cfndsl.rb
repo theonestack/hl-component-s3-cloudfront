@@ -29,7 +29,15 @@ CloudFormation do
 
   bucket_encryption = external_parameters.fetch(:bucket_encryption, nil)
   enable_s3_logging = external_parameters[:enable_s3_logging]
-  block_pub_access = external_parameters.fetch(:block_pub_access, nil)
+
+  block_public_access_default = {
+    BlockPublicAcls: 'false',
+    BlockPublicPolicy: 'false',
+    IgnorePublicAcls: 'false',
+    RestrictPublicBuckets: 'false'
+  }
+    
+  block_pub_access = external_parameters.fetch(:block_pub_access, block_public_access_default)
 
   Condition(:SetLogFilePrefix, FnNot(FnEquals(Ref(:LogFilePrefix), ''))) if enable_s3_logging
 
