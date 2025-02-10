@@ -12,8 +12,7 @@ CfhighlanderTemplate do
     end
   end
 
-  Component name: cloudfront_component_name, template: 'cloudfront@0.8.3', render: Inline, config: @config do
-    parameter name: "s3bucketOriginDomainName", value: FnGetAtt('Bucket', 'DomainName')
+  Component name: cloudfront_component_name, template: 'cloudfront@0.8.4', render: Inline, config: @config do
     additional_parameters.each do |parameter_name|
       parameter name: parameter_name, value: Ref(parameter_name)
     end if defined? additional_parameters
