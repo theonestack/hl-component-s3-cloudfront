@@ -37,18 +37,31 @@ CloudFormation do
         BucketEncryption bucket_encryption unless bucket_encryption.nil?
       end
 
+      use_access_identity = external_parameters.fetch(:use_access_identity, false)
       policy_document = {
         Version: '2008-10-17',
-        Id: 'PolicyForCloudFrontContent',
-        Statement: [
-          {
-            Effect: 'Allow',
-            Action: 's3:GetObject',
-            Resource: FnJoin('', [ 'arn:aws:s3:::', Ref("#{id}Bucket"), '/*']),
-            Principal: { CanonicalUser: { "Fn::GetAtt" => ["#{saved_id}OriginAccessIdentity", 'S3CanonicalUserId'] }}
-          }
-        ]
+        Id: 'PolicyForCloudFrontContent'
       }
+
+      if (use_access_identity == true)
+        statement = {}
+        statement['Effect'] = 'Allow'
+        statement['Principal'] = { Service: 'cloudfront.amazonaws.com'}
+        statement['Resource'] = FnJoin('', [ 'arn:aws:s3:::', bucket_name, '/*'])
+        statement['Action'] = 's3:GetObject'
+        statement['Principal'] = { CanonicalUser: { "Fn::GetAtt" => ["#{saved_id}OriginAccessIdentity", "S3CanonicalUserId"] }}
+        policy_document["Statement"] = []
+        policy_document["Statement"] << statement
+      else
+        statement = {}
+        statement['Effect'] = 'Allow'
+        statement['Principal'] = { Service: 'cloudfront.amazonaws.com'}
+        statement['Resource'] = FnJoin('', [ 'arn:aws:s3:::', bucket_name, '/*'])
+        statement['Action'] = 's3:GetObject'
+        statement['Condition'] = { StringEquals: {'AWS:SourceArn': FnJoin('', ['arn:aws:cloudfront::', Ref('AWS::AccountId'), ':distribution/', 'Ref' => 'Distribution' ]) }}
+        policy_document["Statement"] = []
+        policy_document["Statement"] << statement
+      end
 
       if (config.has_key?('bucket_policy') and !config['bucket_policy'].nil?)
         bucket_policy = config['bucket_policy']
