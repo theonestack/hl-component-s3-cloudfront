@@ -1,0 +1,206 @@
+test_metadata:
+  type: config
+  name: S3-backed origin created with AWS::CloudFormation::CustomResource
+  description: S3-backed origin created with AWS::CloudFormation::CustomResource
+
+subcomponent_config_file:  true
+
+comment:
+  Fn::Join:
+    - ' '
+    - - Ref: DnsPrefix
+      - www
+      - distribution
+
+dns_format:
+  Fn::Join:
+    - '.'
+    - - Ref: DnsPrefix
+      - Ref: DnsDomain
+
+http_version: http2and3
+
+ssl:
+  type: acm
+  minimum_protocol_version: TLSv1.2_2021
+
+aliases:
+  - ${EnvironmentName}.${DnsDomain}
+
+use_access_identity: false
+
+enable_s3_logging: false
+
+cloudfront_component_name: c
+export_name: c
+
+origins:
+  static:
+    source: s3
+    bucket_deletion_policy: Retain
+    type: create_if_not_exists
+    bucket_name:
+      Fn::Join:
+        - ''
+        - - 'static'
+          - '-'
+          - Ref: DnsPrefix
+          - '-'
+          - Ref: AWS::Region
+          - '.'
+          - Ref: DnsDomain
+    block_pub_access:
+      BlockPublicAcls: true
+      BlockPublicPolicy: true
+      IgnorePublicAcls: false
+      RestrictPublicBuckets: false
+  s3dummy:
+    source: s3
+    bucket_deletion_policy: Retain
+    type: create_if_not_exists
+    bucket_name:
+      Fn::Join:
+        - ''
+        - - 'dummy'
+          - '-'
+          - Ref: DnsPrefix
+          - '-'
+          - Ref: AWS::Region
+          - '.'
+          - Ref: DnsDomain
+    block_pub_access:
+      BlockPublicAcls: true
+      BlockPublicPolicy: true
+      IgnorePublicAcls: false
+      RestrictPublicBuckets: false
+  s3temp:
+    source: s3
+    bucket_name:
+      Fn::Join:
+        - ''
+        - - 'temp'
+          - '-'
+          - Ref: DnsPrefix
+          - '-'
+          - Ref: AWS::Region
+          - '.'
+          - Ref: DnsDomain
+    block_pub_access:
+      BlockPublicAcls: true
+      BlockPublicPolicy: true
+      IgnorePublicAcls: false
+      RestrictPublicBuckets: false
+  www:
+    source: loadbalancer
+    protocol_policy: https-only
+    read_timeout: 60
+    ssl_policy:
+      - TLSv1.2
+
+cache_policies:
+  default:
+    Comment: The default policy for www
+    DefaultTTL: 86400
+    MaxTTL: 31536000
+    MinTTL: 0
+    Name: www-default
+    CookieBehavior: none
+    EnableAcceptEncodingBrotli: false
+    EnableAcceptEncodingGzip: true
+    HeaderBehavior: whitelist
+    Headers:
+      - Host
+      - CloudFront-Viewer-Country
+    QueryStringBehavior: whitelist
+    QueryStrings:
+      - delta
+  login:
+    Comment: The login page policy for www
+    DefaultTTL: 86400
+    MaxTTL: 31536000
+    MinTTL: 0
+    Name: www-login
+    CookieBehavior: none
+    EnableAcceptEncodingBrotli: false
+    EnableAcceptEncodingGzip: true
+    HeaderBehavior: whitelist
+    Headers:
+      - Host
+    QueryStringBehavior: all
+  other:
+    Comment: The policy for other parts of www
+    DefaultTTL: 86400
+    MaxTTL: 31536000
+    MinTTL: 0
+    Name: www-other
+    CookieBehavior: none
+    EnableAcceptEncodingBrotli: false
+    EnableAcceptEncodingGzip: true
+    HeaderBehavior: whitelist
+    Headers:
+      - Host
+    QueryStringBehavior: none
+    
+origin_request_policies:
+  origin-default:
+    Comment: The default policy for origin request
+    Name: www-origin-default
+    CookieBehavior: none
+    HeaderBehavior: allViewer
+    QueryStringBehavior: all
+
+behaviours:
+  default:
+    MinTTL: 0
+    DefaultTTL: 86400
+    MaxTTL: 31536000
+    AllowedMethods:
+      - GET
+      - HEAD
+      - OPTIONS
+      - PUT
+      - PATCH
+      - POST
+      - DELETE
+    Compress: true
+    TargetOriginId: www
+    CachePolicyId: default
+    OriginRequestPolicyId: origin-default
+    ViewerProtocolPolicy: redirect-to-https
+    GrpcConfig:
+      Enabled: true
+  custom:
+    -
+      PathPattern: /login
+      AllowedMethods:
+        - GET
+        - HEAD
+      Compress: true
+      TargetOriginId: www
+      CachePolicyId: login
+      ViewerProtocolPolicy: redirect-to-https
+    -
+      PathPattern: /consent
+      AllowedMethods:
+        - GET
+        - HEAD
+      Compress: true
+      TargetOriginId: www
+      CachePolicyId: other
+      ViewerProtocolPolicy: redirect-to-https
+    -
+      PathPattern: /oauth
+      AllowedMethods:
+        - GET
+        - HEAD
+      Compress: true
+      TargetOriginId: www
+      CachePolicyId: other
+      ViewerProtocolPolicy: redirect-to-https
+
+custom_error_responses:
+  -
+    ErrorCode: 403
+    ResponsePagePath: /error-pages/403-forbidden.html
+    ResponseCode: 403
+    ErrorCachingMinTTL: 10
