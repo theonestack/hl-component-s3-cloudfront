@@ -10,3 +10,11 @@ block_pub_access:
   BlockPublicPolicy: true
   IgnorePublicAcls: false
   RestrictPublicBuckets: false
+
+origins:
+  s3bucket:
+    source: s3
+
+behaviours:
+  default:
+    TargetOriginId: s3bucket

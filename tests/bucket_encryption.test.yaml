@@ -11,3 +11,11 @@ bucket_encryption:
     -
       ServerSideEncryptionByDefault:
         SSEAlgorithm: AES256
+
+origins:
+  s3bucket:
+    source: s3
+
+behaviours:
+  default:
+    TargetOriginId: s3bucket

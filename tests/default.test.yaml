@@ -2,3 +2,11 @@ test_metadata:
   type: config
   name: default
   description: set the description for your test
+
+origins:
+  s3bucket:
+    source: s3
+
+behaviours:
+  default:
+    TargetOriginId: s3bucket

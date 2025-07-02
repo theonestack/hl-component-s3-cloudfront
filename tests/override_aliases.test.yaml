@@ -5,3 +5,11 @@ test_metadata:
 
 aliases:
   - www.example.com
+
+origins:
+  s3bucket:
+    source: s3
+
+behaviours:
+  default:
+    TargetOriginId: s3bucket
