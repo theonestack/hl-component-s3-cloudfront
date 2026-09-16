@@ -1,19 +1,18 @@
 test_metadata:
   type: config
-  name: Bucket and policy
-  description: Create bucket and bucket policy
-
-bucket_name: frontend.${EnvironmentName}.${DnsDomain}
-bucket_policy:
-  loadbalancer-logs:
-    actions:
-      - s3:PutObject
-    principal:
-      AWS: "arn:aws:iam::111111111111:root"
+  name: bucket_policy
+  description: Create bucket and bucket policy with an extra statement (OAC origin)
 
 origins:
   s3bucket:
     source: s3
+    bucket_name: frontend.${EnvironmentName}.${DnsDomain}
+    bucket_policy:
+      loadbalancer-logs:
+        actions:
+          - s3:PutObject
+        principal:
+          AWS: "arn:aws:iam::111111111111:root"
 
 behaviours:
   default:

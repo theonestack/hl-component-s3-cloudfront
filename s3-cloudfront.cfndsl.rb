@@ -87,7 +87,13 @@ CloudFormation do
         name_part = ""
       end
       bucket_encryption = config.has_key?('bucket_encryption') ? config['bucket_encryption'] : nil
-      bucket_name = config.has_key?('bucket_name') ? config['bucket_name'] : FnJoin('', ['static', name_part, '-', Ref('EnvironmentName'), '-', Ref('AWS::Region'), '.', Ref('DnsDomain')])
+      # Only a plain string needs FnSub; a bucket_name given as an intrinsic
+      # (Fn::Join, Ref, ...) is already resolvable and must be passed through.
+      bucket_name = if config.has_key?('bucket_name')
+        config['bucket_name'].is_a?(String) ? FnSub(config['bucket_name']) : config['bucket_name']
+      else
+        FnJoin('', ['static', name_part, '-', Ref('EnvironmentName'), '-', Ref('AWS::Region'), '.', Ref('DnsDomain')])
+      end
       bucket_type = config.has_key?('type') ? config['type'] : 'default'
 
       block_public_access_default = {
@@ -122,7 +128,8 @@ CloudFormation do
       use_access_identity = external_parameters.fetch(:use_access_identity, false)
       policy_document = {
         Version: '2008-10-17',
-        Id: 'PolicyForCloudFrontContent'
+        Id: 'PolicyForCloudFrontContent',
+        Statement: []
       }
 
       if (use_access_identity == true)
@@ -132,8 +139,7 @@ CloudFormation do
         statement['Resource'] = FnJoin('', [ 'arn:aws:s3:::', bucket_name, '/*'])
         statement['Action'] = 's3:GetObject'
         statement['Principal'] = { CanonicalUser: { "Fn::GetAtt" => ["#{saved_id}OriginAccessIdentity", "S3CanonicalUserId"] }}
-        policy_document["Statement"] = []
-        policy_document["Statement"] << statement
+        policy_document[:Statement] << statement
       else
         statement = {}
         statement['Effect'] = 'Allow'
@@ -141,8 +147,7 @@ CloudFormation do
         statement['Resource'] = FnJoin('', [ 'arn:aws:s3:::', bucket_name, '/*'])
         statement['Action'] = 's3:GetObject'
         statement['Condition'] = { StringEquals: {'AWS:SourceArn': FnJoin('', ['arn:aws:cloudfront::', Ref('AWS::AccountId'), ':distribution/', 'Ref' => 'Distribution' ]) }}
-        policy_document["Statement"] = []
-        policy_document["Statement"] << statement
+        policy_document[:Statement] << statement
       end
 
       if (config.has_key?('bucket_policy') and !config['bucket_policy'].nil?)
