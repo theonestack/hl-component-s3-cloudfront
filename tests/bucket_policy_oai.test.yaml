@@ -1,0 +1,27 @@
+test_metadata:
+  type: config
+  name: bucket_policy_oai
+  description: Extra bucket policy statements on top of the legacy OAI grant
+
+use_access_identity: true
+
+origins:
+  s3bucket:
+    source: s3
+    bucket_name: frontend.${EnvironmentName}.${DnsDomain}
+    bucket_policy:
+      deny-private-prefix:
+        effect: Deny
+        principal:
+          CanonicalUser:
+            Fn::GetAtt:
+              - s3bucketOriginAccessIdentity
+              - S3CanonicalUserId
+        actions:
+          - s3:GetObject
+        resource:
+          - Fn::Sub: arn:aws:s3:::${Bucket}/private/*
+
+behaviours:
+  default:
+    TargetOriginId: s3bucket
